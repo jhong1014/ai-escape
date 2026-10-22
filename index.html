@@ -1572,7 +1572,8 @@ function syncPresence() {
   const sig = p ? JSON.stringify(p) : "none";
   if (sig === LIVE.sent) return;
   LIVE.sent = sig;
-  try { p ? LIVE.chan.track(p) : LIVE.chan.untrack(); } catch (e) {}
+  /* 수퍼베이스는 접속 신호를 보낸 화면에만 접속자 목록을 보내 줘요. 결과판 · 관리자 · 시작 화면은 '관람자'로 신호만 보내고 목록에서는 빠져요. */
+  try { LIVE.chan.track(p || { role: "viewer" }); } catch (e) {}
 }
 /* 상태바: 같은 학교에서 지금 도전 중인 사람 수 */
 function drawLiveCount() {
