@@ -763,13 +763,13 @@ function viewStart() {
   };
   [hak, name].forEach(i => i.addEventListener("keydown", e => { if (e.key === "Enter") start(); }));
   return el("section", { class: "intro" },
-    el("div", { class: "eyebrow" }, "Ⅲ. 인공지능의 학습 · 방탈출"),
+    el("div", { class: "eyebrow" }, "Ⅲ. 학습하는 인공지능 · 방탈출"),
     el("h1", { html: "AI 연구소<br><span>탈출</span>" }),
     el("div", { class: "stripe" }),
     guide("안녕! 나는 안내 로봇 러닝이야. 정전 때문에 문이 다 잠겨 버렸어. 방마다 내가 단서를 알려 줄게!", "img/bot-wave.png"),
-    el("p", { class: "story" }, "견학을 온 당신이 AI 연구소에 들어서자 정전이 일어나고 모든 문이 잠겼어요. 연구소 메인 컴퓨터는 \"인공지능의 학습 원리를 이해한 사람만 내보내 주겠다\"고 말합니다. 7개의 방에서 문제를 풀어 코드 조각을 모으고, 40분 안에 탈출문을 여세요!"),
+    el("p", { class: "story" }, "견학을 온 당신이 AI 연구소에 들어서자 정전이 일어나고 모든 문이 잠겼어요. 연구소 메인 컴퓨터는 \"인공지능의 학습 원리를 이해한 사람만 내보내 주겠다\"고 말합니다. ６개의 방에서 문제를 풀어 코드 조각을 모으고, 40분 안에 탈출문을 여세요!"),
     el("div", { class: "rules" },
-      el("div", { class: "rule" }, el("b", null, "방 7개 + 탈출문"), "앞 방을 통과해야 다음 방이 열려요."),
+      el("div", { class: "rule" }, el("b", null, "방 ６개 + 탈출문"), "앞 방을 통과해야 다음 방이 열려요."),
       el("div", { class: "rule" }, el("b", null, "단서 노트"), "방마다 수업 내용을 정리한 단서가 있어요."),
       el("div", { class: "rule" }, el("b", null, "힌트 1회"), "막히면 방마다 힌트를 한 번 볼 수 있어요."),
       el("div", { class: "rule" }, el("b", null, "순위"), "빨리 탈출하고 오답이 적을수록 순위가 높아요.")
