@@ -298,7 +298,7 @@ textarea { width: 100%; font-family: var(--f-mono); font-size: 14px; border: 1px
 .lp-time { font-family: var(--f-mono); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--muted); }
 .lp-where { font-size: 13px; font-weight: 700; color: var(--accent); }
 .lp.done .lp-where { color: var(--ok); }
-.lp-bar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.lp-bar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; }
 .lp-bar i { height: 6px; border-radius: 3px; background: var(--line); }
 .lp-bar i.on { background: var(--ok); }
 
@@ -507,33 +507,7 @@ const ROOMS = [
     ]
   },
   {
-    id: "R-04", name: "신경망 회로실", topic: "딥러닝", piece: "5", pieceNote: "사람의 이미지 인식 오류율(%)", img: "img/brain.png",
-    say: "여기는 사람 뇌를 흉내 낸 인공신경망 회로실이야. 회로를 바르게 연결해 줘!",
-    clue: {
-      lines: [
-        "<b>딥러닝</b>: 사람 뇌의 신경 세포(뉴런)가 연결된 모습을 흉내 낸 인공신경망으로 학습해요. 데이터가 많을수록 성능이 좋아져요.",
-        "입력층: 데이터셋으로부터 입력을 받는 층 · 은닉층: 입력값을 처리한 뒤 결과를 전달하는 층 · 출력층: 학습된 결과(정답)를 출력하는 층",
-        "이미지넷(ImageNet) 대회의 이미지 인식 오류율 변화는 아래 표와 같아요."
-      ],
-      table: { head: ["구분", "인식 오류율"],
-        rows: [["2011년 (딥러닝 이전)", "26.0%"], ["2012년 알렉스넷", "16.4%"], ["사람", "약 5.0%"], ["2015년 딥러닝 (ResNet)", "3.6%"]] }
-    },
-    hint: "단서 노트의 표에서 오류율 숫자를 비교해 보세요. 2015년 딥러닝은 사람보다 더 정확해요.",
-    tasks: [
-      { type: "match", q: "회로의 각 층에 맞는 설명을 연결하세요.",
-        pairs: [["입력층", "데이터셋으로부터 입력을 받는 층"], ["은닉층", "입력값을 처리한 뒤 결과를 전달하는 층"], ["출력층", "학습된 결과(정답)를 출력하는 층"]],
-        explain: "입력층 → 은닉층 → 출력층 순서로 데이터가 흘러가요." },
-      { type: "order", q: "이미지 인식 오류율이 높은 것부터 낮은 것 순서로 눌러 보세요.",
-        items: ["2011년 딥러닝 이전", "2012년 알렉스넷", "사람", "2015년 딥러닝 (ResNet)"],
-        explain: "26.0% → 16.4% → 약 5.0% → 3.6%. 2015년에는 딥러닝이 사람보다 정확해졌어요." },
-      { type: "number", q: "사람의 이미지 인식 오류율은 약 몇 %인가요? (숫자만 입력)", answer: 5,
-        explain: "사람은 약 5%를 틀려요. 딥러닝(ResNet)은 3.6%로 사람보다 적게 틀렸어요." },
-      { type: "ox", q: "딥러닝은 데이터가 많을수록 성능이 좋아진다.", answer: 0,
-        explain: "맞아요. 딥러닝은 데이터와 컴퓨팅 파워가 늘어나면서 폭발적으로 발전했어요." }
-    ]
-  },
-  {
-    id: "R-05", name: "시험 준비실", topic: "학습 모델과 데이터 구성", piece: "75", pieceNote: "학습 데이터 비율(%)", img: "img/bot-books.png",
+    id: "R-04", name: "시험 준비실", topic: "학습 모델과 데이터 구성", piece: "75", pieceNote: "학습 데이터 비율(%)", img: "img/bot-books.png",
     say: "으, 공부할 게 산더미야! AI도 시험 준비하듯 데이터를 나눠서 공부한대.",
     clue: {
       lines: [
@@ -559,7 +533,7 @@ const ROOMS = [
     ]
   },
   {
-    id: "R-06", name: "학습 조절실", topic: "에포크 · 배치 크기 · 학습률 · 정확도", piece: "1", pieceNote: "정확도의 최댓값", img: "img/cycle.png",
+    id: "R-05", name: "학습 조절실", topic: "에포크 · 배치 크기 · 학습률 · 정확도", piece: "1", pieceNote: "정확도의 최댓값", img: "img/cycle.png",
     say: "고장 난 AI들이 줄 서 있어! 에포크, 배치 크기, 학습률을 조절해서 고쳐 줘.",
     clue: {
       lines: [
@@ -591,7 +565,7 @@ const ROOMS = [
     ]
   },
   {
-    id: "R-07", name: "윤리 심사실", topic: "데이터 편향 · 생성형 AI · XAI", piece: "119", pieceNote: "스마트워치 자동 신고 번호", img: "img/xai-talk.png",
+    id: "R-06", name: "윤리 심사실", topic: "데이터 편향 · 생성형 AI · XAI", piece: "119", pieceNote: "스마트워치 자동 신고 번호", img: "img/xai-talk.png",
     say: "마지막 방이야! 공정하고 믿을 수 있는 AI를 만드는 방법을 함께 생각해 보자.",
     clue: {
       lines: [
@@ -767,9 +741,9 @@ function viewStart() {
     el("h1", { html: "AI 연구소<br><span>탈출</span>" }),
     el("div", { class: "stripe" }),
     guide("안녕! 나는 안내 로봇 러닝이야. 정전 때문에 문이 다 잠겨 버렸어. 방마다 내가 단서를 알려 줄게!", "img/bot-wave.png"),
-    el("p", { class: "story" }, "견학을 온 당신이 AI 연구소에 들어서자 정전이 일어나고 모든 문이 잠겼어요. 연구소 메인 컴퓨터는 \"인공지능의 학습 원리를 이해한 사람만 내보내 주겠다\"고 말합니다. ６개의 방에서 문제를 풀어 코드 조각을 모으고, 40분 안에 탈출문을 여세요!"),
+    el("p", { class: "story" }, "견학을 온 당신이 AI 연구소에 들어서자 정전이 일어나고 모든 문이 잠겼어요. 연구소 메인 컴퓨터는 \"인공지능의 학습 원리를 이해한 사람만 내보내 주겠다\"고 말합니다. 6개의 방에서 문제를 풀어 코드 조각을 모으고, 40분 안에 탈출문을 여세요!"),
     el("div", { class: "rules" },
-      el("div", { class: "rule" }, el("b", null, "방 ６개 + 탈출문"), "앞 방을 통과해야 다음 방이 열려요."),
+      el("div", { class: "rule" }, el("b", null, "방 6개 + 탈출문"), "앞 방을 통과해야 다음 방이 열려요."),
       el("div", { class: "rule" }, el("b", null, "단서 노트"), "방마다 수업 내용을 정리한 단서가 있어요."),
       el("div", { class: "rule" }, el("b", null, "힌트 1회"), "막히면 방마다 힌트를 한 번 볼 수 있어요."),
       el("div", { class: "rule" }, el("b", null, "순위"), "빨리 탈출하고 오답이 적을수록 순위가 높아요.")
@@ -1049,7 +1023,7 @@ function viewFinal() {
     el("div", { class: "stripe" }),
     guide("다 왔어! 방에서 모은 코드 조각을 순서대로 이어서 입력하면 문이 열려.", "img/bot-wave.png"),
     el("div", { class: "panel keypad" },
-      el("p", { style: "margin:0" }, "메인 컴퓨터: \"R-01부터 R-07까지 얻은 코드 조각을 순서대로 이어 붙여 입력하시오.\""),
+      el("p", { style: "margin:0" }, `메인 컴퓨터: "R-01부터 ${ROOMS[ROOMS.length - 1].id}까지 얻은 코드 조각을 순서대로 이어 붙여 입력하시오."`),
       el("div", { class: "board" }, ROOMS.map(r => el("div", { class: "slot" }, el("small", null, r.id), el("span", null, r.piece)))),
       inp,
       el("button", { class: "btn primary", onclick: open }, "문 열기"),
@@ -1081,7 +1055,7 @@ function viewCert() {
       el("div", { class: "rank" }, "등급 · " + rankOf(sec, hints, wrong)),
       el("div", { class: "stats" },
         el("div", null, el("b", null, fmt(sec)), el("small", null, inTime ? "걸린 시간" : "걸린 시간 (40분 초과)")),
-        el("div", null, el("b", null, hints + " / 7"), el("small", null, "사용한 힌트")),
+        el("div", null, el("b", null, hints + " / " + ROOMS.length), el("small", null, "사용한 힌트")),
         el("div", null, el("b", null, String(wrong)), el("small", null, "오답 횟수")),
         el("div", null, el("b", null, clock(state.finishedAt).split(" ")[1]), el("small", null, "탈출 시각"))
       )
@@ -1094,7 +1068,6 @@ function viewCert() {
       el("ul", { style: "margin:0;padding-left:20px;display:grid;gap:4px" },
         el("li", null, "학습: 데이터에서 특징과 규칙을 스스로 찾아내는 과정"),
         el("li", null, "지도 학습은 정답이 있는 데이터로, 비지도 학습은 정답 없이 비슷한 것끼리 묶어요"),
-        el("li", null, "딥러닝: 인공신경망으로 학습하며, 데이터가 많을수록 성능이 좋아져요"),
         el("li", null, "학습 데이터 · 검증 데이터 · 테스트 데이터 = 연습문제 · 모의고사 · 실전 시험"),
         el("li", null, "에포크 · 배치 크기 · 학습률을 알맞게 조절하고, acc와 val_acc로 성능을 평가해요"),
         el("li", null, "편향 없는 데이터, 새 콘텐츠를 만드는 생성형 AI, 이유를 설명하는 XAI")
