@@ -634,7 +634,7 @@ const LIVE = { chan: null, ready: false, players: [], sent: "", me: (() => {
 let state = load();
 let timerId = null;
 
-function blank() { return { school: "", grade: 0, ban: 0, name: "", num: 0, startedAt: 0, cleared: [], taskIdx: {}, hints: [], wrong: 0, finishedAt: 0, view: "start", room: 0 }; }
+function blank() { return { school: "", grade: 0, ban: 0, name: "", num: 0, startedAt: 0, order: null, qorder: {}, cleared: [], taskIdx: {}, hints: [], wrong: 0, finishedAt: 0, view: "start", room: 0 }; }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.view) return Object.assign(blank(), s); } catch (e) {} return blank(); }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} syncPresence(); }
 
@@ -657,6 +657,33 @@ function elapsed() { return ((state.finishedAt || Date.now()) - state.startedAt)
 
 function guide(text, src) {
   return el("div", { class: "guide" }, el("img", { src: src, alt: "안내 로봇 러닝이" }), el("div", { class: "bubble" }, el("b", null, "러닝이"), text));
+}
+
+/* 받침에 따라 '으로' / '로' (ㄹ 받침은 '로') */
+function euro(w) { const c = String(w).charCodeAt(String(w).length - 1) - 0xac00; if (c < 0 || c > 11171) return "(으)로"; const j = c % 28; return j === 0 || j === 8 ? "로" : "으로"; }
+/* 방 순서: 학생마다 무작위 (이미 통과한 방이 있으면 그 방들을 앞에 둬요) */
+function roomOrder() {
+  const n = ROOMS.length, o = state.order;
+  if (Array.isArray(o) && o.length === n && new Set(o).size === n && o.every(i => i >= 0 && i < n)) return o;
+  const idx = [...Array(n).keys()];
+  const done = idx.filter(i => state.cleared.includes(ROOMS[i].id));
+  state.order = done.concat(shuffle(idx.filter(i => !done.includes(i))));
+  save();
+  return state.order;
+}
+/* 지금 열려 있는 방(순서상 아직 통과하지 않은 첫 방). 다 통과했으면 -1 */
+function openRoom() { const o = roomOrder(); const i = o.find(k => !state.cleared.includes(ROOMS[k].id)); return i == null ? -1 : i; }
+/* 방 안 문제 순서: 방마다 무작위 (이미 푼 문제 수는 그대로 앞에 둬요) */
+function taskOrder(r) {
+  const n = r.tasks.length;
+  state.qorder = state.qorder || {};
+  const o = state.qorder[r.id];
+  if (Array.isArray(o) && o.length === n && new Set(o).size === n && o.every(i => i >= 0 && i < n)) return o;
+  const solved = Math.min(state.taskIdx[r.id] || 0, n);
+  const idx = [...Array(n).keys()];
+  state.qorder[r.id] = idx.slice(0, solved).concat(shuffle(idx.slice(solved)));
+  save();
+  return state.qorder[r.id];
 }
 
 function go(view, room) { state.view = view; if (room != null) state.room = room; save(); render(); window.scrollTo(0, 0); }
@@ -769,7 +796,7 @@ function viewStart() {
     guide("안녕! 나는 안내 로봇 러닝이야. 정전 때문에 문이 다 잠겨 버렸어. 방마다 내가 단서를 알려 줄게!", "img/bot-wave.png"),
     el("p", { class: "story" }, "견학을 온 당신이 AI 연구소에 들어서자 정전이 일어나고 모든 문이 잠겼어요. 연구소 메인 컴퓨터는 \"인공지능의 학습 원리를 이해한 사람만 내보내 주겠다\"고 말합니다. 6개의 방에서 문제를 풀어 코드 조각을 모으고, 40분 안에 탈출문을 여세요!"),
     el("div", { class: "rules" },
-      el("div", { class: "rule" }, el("b", null, "방 6개 + 탈출문"), "앞 방을 통과해야 다음 방이 열려요."),
+      el("div", { class: "rule" }, el("b", null, "방 6개 + 탈출문"), "방 순서와 문제 순서는 사람마다 달라요. 열린 방을 통과하면 다음 방이 열려요."),
       el("div", { class: "rule" }, el("b", null, "단서 노트"), "방마다 수업 내용을 정리한 단서가 있어요."),
       el("div", { class: "rule" }, el("b", null, "힌트 1회"), "막히면 방마다 힌트를 한 번 볼 수 있어요."),
       el("div", { class: "rule" }, el("b", null, "순위"), "빨리 탈출하고 오답이 적을수록 순위가 높아요.")
@@ -794,12 +821,14 @@ function viewStart() {
 function viewMap() {
   const n = state.cleared.length;
   const grid = el("div", { class: "map" });
-  ROOMS.forEach((r, i) => {
-    const done = state.cleared.includes(r.id), open = !done && i === n, locked = i > n;
+  const cur = openRoom();
+  roomOrder().forEach((i, k) => {
+    const r = ROOMS[i];
+    const done = state.cleared.includes(r.id), open = i === cur, locked = !done && !open;
     const cls = "door " + (done ? "done" : open ? "open" : "locked");
     const ti = state.taskIdx[r.id] || 0;
     grid.append(el("button", { class: cls, disabled: locked, "aria-label": r.name + (locked ? " (잠김)" : ""), onclick: () => go("room", i) },
-      el("div", { class: "plate" }, el("span", null, r.id), el("span", null, done ? "코드 " + r.piece : "")),
+      el("div", { class: "plate" }, el("span", null, `${k + 1}번째 · ${r.id}`), el("span", null, done ? "코드 " + r.piece : "")),
       el("h3", null, r.name),
       el("div", { class: "topic" }, r.topic),
       el("div", { class: "state" }, done ? "통과 ✓ 다시 보기" : open ? (ti ? `진행 중 · ${ti}/${r.tasks.length}` : "입장 가능 ▶") : "잠김"),
@@ -815,7 +844,7 @@ function viewMap() {
     el("img", { class: "thumb", src: "img/trophy.png", alt: "" })
   ));
   return el("section", { class: "task" },
-    el("div", null, el("div", { class: "eyebrow" }, "연구소 지도"), el("h2", { style: "font-size:32px" }, allDone ? "모든 코드 조각을 모았어요!" : `${ROOMS[n].name}의 문이 열려 있어요`)),
+    el("div", null, el("div", { class: "eyebrow" }, "연구소 지도"), el("h2", { style: "font-size:32px" }, allDone || cur < 0 ? "모든 코드 조각을 모았어요!" : `${ROOMS[cur].name}의 문이 열려 있어요`)),
     grid,
     resetControl()
   );
@@ -836,6 +865,7 @@ function resetControl() {
 
 function viewRoom(i) {
   const r = ROOMS[i];
+  if (!r || (!state.cleared.includes(r.id) && i !== openRoom())) { state.view = "map"; save(); return viewMap(); }
   const done = state.cleared.includes(r.id);
   const clueBody = el("div", { class: "clue-body" }, el("ul", null, r.clue.lines.map(l => el("li", { html: l }))));
   if (r.clue.table) {
@@ -868,7 +898,7 @@ function viewRoom(i) {
 
   const panel = el("div", { class: "panel task" },
     el("div", { class: "task-top" }, el("span", { class: "eyebrow" }, `문제 ${ti + 1} / ${r.tasks.length}`), dots),
-    makeTask(r.tasks[ti], () => {
+    makeTask(r.tasks[taskOrder(r)[ti]], () => {
       state.taskIdx[r.id] = ti + 1;
       if (ti + 1 >= r.tasks.length) { state.cleared.push(r.id); save(); render(); window.scrollTo(0, 0); }
       else { save(); render(); }
@@ -882,7 +912,9 @@ function viewRoom(i) {
 
 function clearPanel(i) {
   const r = ROOMS[i];
-  const last = i === ROOMS.length - 1;
+  const o = roomOrder(), pos = o.indexOf(i);
+  const nextI = o.slice(pos + 1).find(k => !state.cleared.includes(ROOMS[k].id));
+  const last = nextI == null;
   return el("div", { class: "panel clear pop" },
     el("img", { src: "img/bot-yay.png", alt: "기뻐하는 안내 로봇" }),
     el("div", { class: "eyebrow" }, "코드 조각 획득"),
@@ -890,7 +922,7 @@ function clearPanel(i) {
     el("p", { class: "muted", style: "margin:0" }, r.pieceNote),
     el("div", { class: "row", style: "justify-content:center" },
       el("button", { class: "btn", onclick: () => go("map") }, "지도 보기"),
-      el("button", { class: "btn primary", onclick: () => last ? go("final") : go("room", i + 1) }, last ? "탈출문으로 ▶" : `${ROOMS[i + 1].name}으로 ▶`)
+      el("button", { class: "btn primary", onclick: () => last ? go("final") : go("room", nextI) }, last ? "탈출문으로 ▶" : `${ROOMS[nextI].name}${euro(ROOMS[nextI].name)} ▶`)
     )
   );
 }
@@ -1038,7 +1070,7 @@ function viewFinal() {
     fb.className = "fb";
     if (v === FINAL_CODE) { state.finishedAt = Date.now(); go("cert"); return; }
     state.wrong++; save();
-    fb.classList.add("bad"); fb.textContent = "삐빅! 코드가 틀렸어요. 방 순서대로 조각을 이어 붙였는지 확인해 보세요.";
+    fb.classList.add("bad"); fb.textContent = "삐빅! 코드가 틀렸어요. 푼 순서가 아니라 방 번호(R-01부터) 순서대로 이어 붙였는지 확인해 보세요.";
   };
   inp.addEventListener("keydown", e => { if (e.key === "Enter") open(); });
   setTimeout(() => inp.focus({ preventScroll: true }), 0);
@@ -1047,7 +1079,7 @@ function viewFinal() {
       el("div", null, el("div", { class: "eyebrow" }, "EXIT · 메인 컴퓨터"), el("h2", null, "탈출문")),
       el("button", { class: "btn ghost", onclick: () => go("map") }, "← 지도로")),
     el("div", { class: "stripe" }),
-    guide("다 왔어! 방에서 모은 코드 조각을 순서대로 이어서 입력하면 문이 열려.", "img/bot-wave.png"),
+    guide("다 왔어! 코드 조각을 네가 푼 순서가 아니라 방 번호 순서(R-01부터)대로 이어서 입력하면 문이 열려.", "img/bot-wave.png"),
     el("div", { class: "panel keypad" },
       el("p", { style: "margin:0" }, `메인 컴퓨터: "R-01부터 ${ROOMS[ROOMS.length - 1].id}까지 얻은 코드 조각을 순서대로 이어 붙여 입력하시오."`),
       el("div", { class: "board" }, ROOMS.map(r => el("div", { class: "slot" }, el("small", null, r.id), el("span", null, r.piece)))),
