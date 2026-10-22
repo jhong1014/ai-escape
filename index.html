@@ -1245,15 +1245,15 @@ function adminLogin() {
       fetchConfig().then(() => { if (!A.dirty) { A.draft = clone(CFG); drawAdmin(); } });
     }, e => {
       btn.disabled = false;
-      msg.textContent = e.code === "bad_password" ? "비밀번호가 맞지 않아요." : "서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.";
+      msg.textContent = e.code === "bad_password" ? "비밀번호 안알랴줌." : "서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요.";
     });
   };
   btn.addEventListener("click", enter);
   pw.addEventListener("keydown", e => { if (e.key === "Enter") enter(); });
   setTimeout(() => pw.focus({ preventScroll: true }), 0);
   return el("div", { class: "panel task", style: "max-width:440px" },
-    el("div", { class: "field" }, el("label", { for: "apw" }, "관리자 비밀번호"), pw),
-    el("p", { class: "muted", style: "margin:0;font-size:14px" }, "처음 비밀번호는 1234예요. 들어온 뒤 '학교 · 설정'에서 꼭 바꿔 주세요."),
+    el("div", { class: "field" }, el("label", { for: "apw" }, "비밀번호"), pw),
+    el("p", { class: "muted", style: "margin:0;font-size:14px" }, " "),
     el("div", { class: "row" }, btn, msg));
 }
 
