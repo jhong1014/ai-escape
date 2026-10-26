@@ -1091,9 +1091,9 @@ function viewFinal() {
 }
 
 function rankOf(sec, hints, wrong) {
-  const inTime = sec <= LIMIT;
-  if (inTime && hints <= 1 && wrong <= 3) return "AI 수석 연구원";
-  if (inTime && hints <= 3 && wrong <= 8) return "AI 책임 연구원";
+  /* 수석: 10분 이내 · 힌트 0개 · 오답 2개 이하 / 책임: 15분 이내 · 힌트 1개 이하 · 오답 3개 이하 */
+  if (sec <= 10 * 60 && hints === 0 && wrong <= 2) return "AI 수석 연구원";
+  if (sec <= 15 * 60 && hints <= 1 && wrong <= 3) return "AI 책임 연구원";
   return "AI 연구원";
 }
 function clock(ms) { const d = new Date(ms); return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${pad2(d.getMinutes())}`; }
